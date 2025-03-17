@@ -1,0 +1,50 @@
+{
+  "kind": "collectionType",
+  "collectionName": "dishes",
+  "info": {
+    "singularName": "plate",
+    "pluralName": "dishes",
+    "displayName": "dishes",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "imagenOfDish": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "nameOfDish": {
+      "type": "string",
+      "required": true
+    },
+    "priceOfDish": {
+      "type": "decimal",
+      "required": true
+    },
+    "allergens": {
+      "type": "component",
+      "repeatable": true,
+      "component": "allergens.allergens"
+    },
+    "enumeration": {
+      "type": "enumeration",
+      "enum": [
+        "First course",
+        "Second course",
+        "Dessert"
+      ]
+    },
+    "daily_menu": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::daily-menu.daily-menu",
+      "inversedBy": "secondCourse"
+    }
+  }
+}
