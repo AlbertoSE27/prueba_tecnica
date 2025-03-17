@@ -15,9 +15,7 @@
       "type": "media",
       "multiple": false,
       "required": true,
-      "allowedTypes": [
-        "images"
-      ]
+      "allowedTypes": ["images"]
     },
     "nameOfDish": {
       "type": "string",
@@ -34,11 +32,7 @@
     },
     "enumeration": {
       "type": "enumeration",
-      "enum": [
-        "First course",
-        "Second course",
-        "Dessert"
-      ]
+      "enum": ["First course", "Second course", "Dessert"]
     },
     "daily_menu": {
       "type": "relation",

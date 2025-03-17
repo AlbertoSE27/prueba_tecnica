@@ -1,10 +1,10 @@
 {
   "kind": "collectionType",
-  "collectionName": "daily_menus",
+  "collectionName": "daily-menus",
   "info": {
     "singularName": "daily-menu",
     "pluralName": "daily-menus",
-    "displayName": "dailyMenus",
+    "displayName": "daily-menus",
     "description": ""
   },
   "options": {
@@ -19,13 +19,13 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::plate.plate",
-      "mappedBy": "daily_menu"
+      "mappedBy": "daily-menu"
     },
     "secondCourse": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::plate.plate",
-      "mappedBy": "daily_menu"
+      "mappedBy": "daily-menu"
     },
     "dessert": {
       "type": "relation",
@@ -35,6 +35,9 @@
     "menuPrice": {
       "type": "decimal",
       "required": true
+    },
+    "sumPrice": {
+      "type": "string"
     }
   }
 }

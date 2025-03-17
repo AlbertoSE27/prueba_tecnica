@@ -370,10 +370,10 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
 }
 
 export interface ApiDailyMenuDailyMenu extends Struct.CollectionTypeSchema {
-  collectionName: 'daily_menus';
+  collectionName: 'daily-menus';
   info: {
     description: '';
-    displayName: 'dailyMenus';
+    displayName: 'daily-menus';
     pluralName: 'daily-menus';
     singularName: 'daily-menu';
   };
@@ -396,6 +396,7 @@ export interface ApiDailyMenuDailyMenu extends Struct.CollectionTypeSchema {
     menuPrice: Schema.Attribute.Decimal & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     secondCourse: Schema.Attribute.Relation<'oneToMany', 'api::plate.plate'>;
+    sumPrice: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
