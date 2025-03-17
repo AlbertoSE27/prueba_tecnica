@@ -15,13 +15,19 @@
     "upgrade:dry": "npx @strapi/upgrade latest --dry"
   },
   "dependencies": {
-    "@strapi/plugin-cloud": "5.11.2",
+    "@notum-cz/strapi-plugin-record-locking": "^2.0.0",
+    "@strapi/plugin-cloud": "^5.11.2",
+    "@strapi/plugin-seo": "^2.0.8",
     "@strapi/plugin-users-permissions": "5.11.2",
+    "@strapi/provider-email-amazon-ses": "^5.11.2",
+    "@strapi/provider-upload-aws-s3": "^5.11.2",
     "@strapi/strapi": "5.11.2",
     "mysql2": "3.9.8",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.0.0",
+    "strapi-plugin-email-designer-5": "^0.0.7",
+    "strapi-plugin-multi-select": "^2.1.1",
     "styled-components": "^6.0.0"
   },
   "devDependencies": {
