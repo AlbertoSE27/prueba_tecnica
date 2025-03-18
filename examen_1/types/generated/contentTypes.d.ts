@@ -384,8 +384,8 @@ export interface ApiDailyMenuDailyMenu extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    dessert: Schema.Attribute.Relation<'oneToOne', 'api::plate.plate'>;
-    firstCourse: Schema.Attribute.Relation<'oneToOne', 'api::plate.plate'>;
+    dessert: Schema.Attribute.Relation<'oneToOne', 'api::dish.dish'>;
+    firstCourse: Schema.Attribute.Relation<'oneToOne', 'api::dish.dish'>;
     fixedPriceMenu: Schema.Attribute.Decimal & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -395,7 +395,7 @@ export interface ApiDailyMenuDailyMenu extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     menuDay: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
-    secondCourse: Schema.Attribute.Relation<'oneToOne', 'api::plate.plate'>;
+    secondCourse: Schema.Attribute.Relation<'oneToOne', 'api::dish.dish'>;
     sumPrice: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -403,32 +403,33 @@ export interface ApiDailyMenuDailyMenu extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiPlatePlate extends Struct.CollectionTypeSchema {
+export interface ApiDishDish extends Struct.CollectionTypeSchema {
   collectionName: 'dishes';
   info: {
     description: '';
-    displayName: 'dish';
+    displayName: 'dishes';
     pluralName: 'dishes';
-    singularName: 'plate';
+    singularName: 'dish';
   };
   options: {
     draftAndPublish: true;
   };
   attributes: {
-    allergens: Schema.Attribute.Component<'allergens.allergens', true>;
+    allergen: Schema.Attribute.Component<'allergens.allergens', true>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    enumeration: Schema.Attribute.Enumeration<
-      ['First course', 'Second course', 'Dessert']
-    >;
     imagenOfDish: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<'oneToMany', 'api::plate.plate'> &
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::dish.dish'> &
       Schema.Attribute.Private;
     nameOfDish: Schema.Attribute.String & Schema.Attribute.Required;
     priceOfDish: Schema.Attribute.Decimal & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
+    typeOfDish: Schema.Attribute.Enumeration<
+      ['First Course', 'Second Course', 'Dessert']
+    > &
+      Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1030,7 +1031,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::daily-menu.daily-menu': ApiDailyMenuDailyMenu;
-      'api::plate.plate': ApiPlatePlate;
+      'api::dish.dish': ApiDishDish;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::email-designer-5.email-designer-template': PluginEmailDesigner5EmailDesignerTemplate;

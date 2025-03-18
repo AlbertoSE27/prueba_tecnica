@@ -2,9 +2,9 @@
   "kind": "collectionType",
   "collectionName": "dishes",
   "info": {
-    "singularName": "plate",
+    "singularName": "dish",
     "pluralName": "dishes",
-    "displayName": "dish",
+    "displayName": "dishes",
     "description": ""
   },
   "options": {
@@ -27,18 +27,19 @@
       "type": "decimal",
       "required": true
     },
-    "allergens": {
+    "allergen": {
       "type": "component",
       "repeatable": true,
       "component": "allergens.allergens"
     },
-    "enumeration": {
+    "typeOfDish": {
       "type": "enumeration",
       "enum": [
-        "First course",
-        "Second course",
+        "First Course",
+        "Second Course",
         "Dessert"
-      ]
+      ],
+      "required": true
     }
   }
 }

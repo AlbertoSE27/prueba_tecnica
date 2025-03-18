@@ -18,17 +18,17 @@
     "firstCourse": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "api::plate.plate"
+      "target": "api::dish.dish"
     },
     "secondCourse": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "api::plate.plate"
+      "target": "api::dish.dish"
     },
     "dessert": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "api::plate.plate"
+      "target": "api::dish.dish"
     },
     "fixedPriceMenu": {
       "type": "decimal",
