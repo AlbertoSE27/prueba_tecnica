@@ -3,12 +3,14 @@ import type { Schema, Struct } from '@strapi/strapi';
 export interface AllergensAllergens extends Struct.ComponentSchema {
   collectionName: 'components_allergens_allergens';
   info: {
-    displayName: 'allergens';
+    description: '';
+    displayName: 'allergen';
+    icon: 'alien';
   };
   attributes: {
-    description: Schema.Attribute.String;
-    icon: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
-    name: Schema.Attribute.String;
+    allergenDescription: Schema.Attribute.String;
+    allergenIcon: Schema.Attribute.Media<'images'>;
+    allergenName: Schema.Attribute.String;
   };
 }
 

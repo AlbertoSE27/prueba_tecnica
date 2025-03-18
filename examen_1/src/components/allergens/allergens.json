@@ -1,25 +1,26 @@
 {
   "collectionName": "components_allergens_allergens",
   "info": {
-    "displayName": "allergens"
+    "displayName": "allergen",
+    "icon": "alien",
+    "description": ""
   },
   "options": {},
   "attributes": {
-    "name": {
+    "allergenName": {
+      "type": "string",
+      "required": false
+    },
+    "allergenDescription": {
       "type": "string"
     },
-    "description": {
-      "type": "string"
-    },
-    "icon": {
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ],
+    "allergenIcon": {
       "type": "media",
-      "multiple": false
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
     }
   }
 }

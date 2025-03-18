@@ -4,7 +4,7 @@
   "info": {
     "singularName": "plate",
     "pluralName": "dishes",
-    "displayName": "dishes",
+    "displayName": "dish",
     "description": ""
   },
   "options": {
@@ -15,7 +15,9 @@
       "type": "media",
       "multiple": false,
       "required": true,
-      "allowedTypes": ["images"]
+      "allowedTypes": [
+        "images"
+      ]
     },
     "nameOfDish": {
       "type": "string",
@@ -32,13 +34,11 @@
     },
     "enumeration": {
       "type": "enumeration",
-      "enum": ["First course", "Second course", "Dessert"]
-    },
-    "daily_menu": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::daily-menu.daily-menu",
-      "inversedBy": "secondCourse"
+      "enum": [
+        "First course",
+        "Second course",
+        "Dessert"
+      ]
     }
   }
 }

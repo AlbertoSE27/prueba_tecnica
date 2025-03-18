@@ -370,10 +370,10 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
 }
 
 export interface ApiDailyMenuDailyMenu extends Struct.CollectionTypeSchema {
-  collectionName: 'daily-menus';
+  collectionName: 'daily_menus';
   info: {
     description: '';
-    displayName: 'daily-menus';
+    displayName: 'dailyMenu';
     pluralName: 'daily-menus';
     singularName: 'daily-menu';
   };
@@ -385,7 +385,8 @@ export interface ApiDailyMenuDailyMenu extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     dessert: Schema.Attribute.Relation<'oneToOne', 'api::plate.plate'>;
-    firstCourse: Schema.Attribute.Relation<'oneToMany', 'api::plate.plate'>;
+    firstCourse: Schema.Attribute.Relation<'oneToOne', 'api::plate.plate'>;
+    fixedPriceMenu: Schema.Attribute.Decimal & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -393,9 +394,8 @@ export interface ApiDailyMenuDailyMenu extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     menuDay: Schema.Attribute.String & Schema.Attribute.Required;
-    menuPrice: Schema.Attribute.Decimal & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
-    secondCourse: Schema.Attribute.Relation<'oneToMany', 'api::plate.plate'>;
+    secondCourse: Schema.Attribute.Relation<'oneToOne', 'api::plate.plate'>;
     sumPrice: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -407,7 +407,7 @@ export interface ApiPlatePlate extends Struct.CollectionTypeSchema {
   collectionName: 'dishes';
   info: {
     description: '';
-    displayName: 'dishes';
+    displayName: 'dish';
     pluralName: 'dishes';
     singularName: 'plate';
   };
@@ -419,10 +419,6 @@ export interface ApiPlatePlate extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    daily_menu: Schema.Attribute.Relation<
-      'manyToOne',
-      'api::daily-menu.daily-menu'
-    >;
     enumeration: Schema.Attribute.Enumeration<
       ['First course', 'Second course', 'Dessert']
     >;
