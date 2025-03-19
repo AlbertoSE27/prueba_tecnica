@@ -1,5 +1,5 @@
 //LICECYRCLE SIN EL SERVICIO
-module.exports = {
+/*module.exports = {
   async beforeCreate(event) {
     const { data } = event.params;
     try {
@@ -18,7 +18,7 @@ module.exports = {
       strapi.log.error("Error interno del servidor", error);
     }
   },
-};
+};*/
 
 module.exports = {
   async afterCreate(event) {
