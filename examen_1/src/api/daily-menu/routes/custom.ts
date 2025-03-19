@@ -2,40 +2,27 @@ module.exports = {
   routes: [
     {
       method: "GET",
-      path: "/menu/dessert",
-      handler: "find-dessert.getDessert",
+      path: "/daily-menu/dessert",
+      handler: "custom.getDessert",
       config: { auth: false, policies: [] },
     },
-  ],
-};
-
-module.exports = {
-  routes: [
     {
       method: "GET",
-      path: "/menu?min_price=10&max_price=20",
-      handler: "filter-menu-price.getMenuPrice",
+      path: "/daily-menu/pricerange",
+      handler: "custom.getMenuPrice",
       config: { auth: false, policies: [] },
     },
-  ],
-};
-
-module.exports = {
-  routes: [
     {
       method: "GET",
-      path: "/menu?without_allergens=gluten,lactosa",
-      handler: "filter-menu-allergens.getMenuWithoutAllergens",
+      path: "/daily-menu/withoutallergens",
+      handler: "custom.getMenuWithoutAllergens",
       config: { auth: false, policies: [] },
     },
+    /*{
+      method: "GET",
+      path: "/daily-menu/poppulatedishes",
+      handler: "custom.getPoppularDishes",
+      config: { auth: false, policies: [] },
+    },*/
   ],
 };
-
-/*module.exports={
-    routes:[{
-        method: "GET",
-        path: "/dishes/poppulate",
-        handler: "find-dishes.getPoppularDishes",
-        config: {auth:false, policies:[]}
-    }]
-};*/

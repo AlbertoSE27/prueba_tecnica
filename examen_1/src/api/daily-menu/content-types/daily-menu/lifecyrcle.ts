@@ -19,9 +19,6 @@ module.exports = {
       strapi.log.error("Error interno del servidor", error);
     }
   },
-};
-
-module.exports = {
   async afterCreate(event) {
     const { result } = event;
     try {
@@ -53,9 +50,6 @@ module.exports = {
       strapi.log.error("Error interno del servidor", error);
     }
   },
-};
-
-module.exports = {
   async afterCreate(event) {
     const { result } = event;
     try {

@@ -1,5 +1,4 @@
 const { createCoreController } = require("@strapi/strapi").factories;
-
 module.exports = createCoreController(
   "api::daily-menu.daily-menu",
   ({ strapi }) => ({
@@ -20,12 +19,6 @@ module.exports = createCoreController(
         return ctx.throw(500, "Error interno del servidor");
       }
     },
-  })
-);
-
-module.exports = createCoreController(
-  "api::daily-menu.daily-menu",
-  ({ strapi }) => ({
     async getMenuPrice(ctx) {
       try {
         const { fiexedPriceMenu } = ctx.request.query;
@@ -35,9 +28,9 @@ module.exports = createCoreController(
         const rangeMenuPrice = await strapi
           .documents("api::daily-menu-daily-menu")
           .findMany({
-            filters: { fixedPriceMenu: { $gte: 10, $ite: 20 } },
+            filters: { fixedPriceMenu: { $gte: 10, $lte: 20 } },
           });
-        if (rangeMenuPrice < 10 || rangeMenuPrice > 20) {
+        if (rangeMenuPrice.length === 0) {
           return ctx.badRequest(
             "No se encuentran menún con rando de precio entre 10 y 20"
           );
@@ -47,12 +40,6 @@ module.exports = createCoreController(
         return ctx.throw(500, "Error interno del servidor");
       }
     },
-  })
-);
-
-module.exports = createCoreController(
-  "api::daily-menu.daily-menu",
-  ({ strapi }) => ({
     async getMenuWithoutAllergens(ctx) {
       try {
         const { menuDay, menuId } = ctx.request.query;
@@ -63,7 +50,7 @@ module.exports = createCoreController(
           .documents("api:dish.dish")
           .findMany({
             filters: {
-              allergen: {
+              allergens: {
                 populate: {
                   allergenName: { $notContains: ["gluten", "lactosa"] },
                 },
@@ -78,25 +65,24 @@ module.exports = createCoreController(
         return ctx.throw(500, "Error interno del servidor");
       }
     },
+    /*async getPoppularDishes(ctx) {
+      try {
+        const { nameOfDish, dishId } = ctx.request.query;
+        if (!nameOfDish || !dishId) {
+          return ctx.badRequest("No existe el nombre ni el id del plato");
+        }
+        const poppularDishes = await strapi
+          .documents("api::dish.dish")
+          .findMany({
+            filters: { nameOfDish: "*" },
+          });
+        if (!poppularDishes) {
+          return ctx.badRequest("No existen platos mas vendidos o populares");
+        }
+        return ctx.send(poppularDishes);
+      } catch (error) {
+        return ctx.throw(500, "Error interno del servidor");
+      }
+    },*/
   })
 );
-
-/*module.exports = createCoreController("api::dish.dish", ({ strapi }) => ({
-  async getPoppularDishes(ctx) {
-    try {
-      const { nameOfDish, dishId } = ctx.request.query;
-      if (!nameOfDish || !dishId) {
-        return ctx.badRequest("No existe el nombre ni el id del plato");
-      }
-      const poppularDishes = await strapi.documents("api::dish.dish").findMany({
-        filters: { nameOfDish: },
-      });
-      if (!poppularDishes) {
-        return ctx.badRequest("No existen platos mas vendidos o populares");
-      }
-      return ctx.send(poppularDishes);
-    } catch (error) {
-      return ctx.throw(500, "Error interno del servidor");
-    }
-  },
-}));*/
