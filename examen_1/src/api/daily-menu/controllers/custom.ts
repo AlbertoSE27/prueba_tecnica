@@ -9,7 +9,7 @@ module.exports = createCoreController(
           return ctx.badRequest("El postre no existe en el menú");
         }
         const dessertName = await strapi.documents("api::dish.dish").findMany({
-          filters: { typeOfDish: "Dessert" },
+          filters: { typeOfDish: "dessert" },
         });
         if (!dessertName) {
           return ctx.badRequest("El postre no existe en el menú");
@@ -21,18 +21,18 @@ module.exports = createCoreController(
     },
     async getMenuPrice(ctx) {
       try {
-        const { fiexedPriceMenu } = ctx.request.query;
-        if (!fiexedPriceMenu) {
+        const { fixedPriceMenu } = ctx.request.query;
+        if (!fixedPriceMenu) {
           return ctx.badRequest("El menú no tiene precio");
         }
         const rangeMenuPrice = await strapi
-          .documents("api::daily-menu-daily-menu")
+          .documents("api::daily-menu.daily-menu")
           .findMany({
             filters: { fixedPriceMenu: { $gte: 10, $lte: 20 } },
           });
         if (rangeMenuPrice.length === 0) {
           return ctx.badRequest(
-            "No se encuentran menún con rando de precio entre 10 y 20"
+            "No se encuentran menús con rando de precio entre 10 y 20"
           );
         }
         return ctx.send(rangeMenuPrice);
@@ -42,15 +42,15 @@ module.exports = createCoreController(
     },
     async getMenuWithoutAllergens(ctx) {
       try {
-        const { menuDay, menuId } = ctx.request.query;
-        if (!menuDay || !menuId) {
+        const { menuDay } = ctx.request.query;
+        if (!menuDay) {
           return ctx.badRequest("No existe el menú");
         }
         const menuWithoutAllergens = await strapi
-          .documents("api:dish.dish")
+          .documents("api::dish.dish")
           .findMany({
             filters: {
-              allergens: {
+              allergen: {
                 populate: {
                   allergenName: { $notContains: ["gluten", "lactosa"] },
                 },
@@ -60,6 +60,7 @@ module.exports = createCoreController(
         if (!menuWithoutAllergens) {
           return ctx.badRequest("No existen menús sin gluten o sin lactosa");
         }
+
         return ctx.send(menuWithoutAllergens);
       } catch (error) {
         return ctx.throw(500, "Error interno del servidor");
