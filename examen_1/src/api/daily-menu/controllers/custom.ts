@@ -81,15 +81,15 @@ module.exports = createCoreController(
   })
 );
 
-module.exports = createCoreController("api::dish.dish", ({ strapi }) => ({
-  async getpopularDishes(ctx) {
+/*module.exports = createCoreController("api::dish.dish", ({ strapi }) => ({
+  async getPoppularDishes(ctx) {
     try {
       const { nameOfDish, dishId } = ctx.request.query;
       if (!nameOfDish || !dishId) {
         return ctx.badRequest("No existe el nombre ni el id del plato");
       }
       const poppularDishes = await strapi.documents("api::dish.dish").findMany({
-        filters: { nameOfDish: "*" },
+        filters: { nameOfDish: },
       });
       if (!poppularDishes) {
         return ctx.badRequest("No existen platos mas vendidos o populares");
@@ -99,4 +99,4 @@ module.exports = createCoreController("api::dish.dish", ({ strapi }) => ({
       return ctx.throw(500, "Error interno del servidor");
     }
   },
-}));
+}));*/

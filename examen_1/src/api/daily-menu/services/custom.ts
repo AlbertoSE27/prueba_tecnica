@@ -1,4 +1,3 @@
-import dailyMenu from "../src/api/daily-menu/controllers/daily-menu";
 const { createCoreService } = require("@strapi/strapi").factories;
 module.exports = createCoreService("api::dish.dish", ({ strapi }) => ({
   async getPriceOfDish() {
