@@ -1,7 +1,7 @@
 import dailyMenu from "../src/api/daily-menu/controllers/daily-menu";
 const { createCoreService } = require("@strapi/strapi").factories;
 module.exports = createCoreService("api::dish.dish", ({ strapi }) => ({
-  async getPriceOfDish(priceOfDish) {
+  async getPriceOfDish() {
     try {
       const dishDate = await strapi.documents("api::dish.dish").findMany({
         fields: ["nameOfDish", "priceOfDish"],
@@ -12,18 +12,22 @@ module.exports = createCoreService("api::dish.dish", ({ strapi }) => ({
       const menuDate = await strapi
         .documents("api::daily-menu.daily.menu")
         .findMany({
-          fields: ["menuDay", "fixedPriceMenu"],
+          fields: ["menuDay", "fixedPriceMenu", "sumPrice"],
         });
       if (!menuDate) {
         return { message: "No se encontró el menú o no tiene precio" };
       }
       const taxRate = 0.21;
-      const updateMenuPrice = menuDate[0].fixedPriceMenu * (1 + taxRate);
+      const updateSumPrice = menuDate[0].sumPrice * (1 + taxRate);
+      const updatefixedPriceMenu = menuDate[0].fixedPriceMenu * (1 + taxRate);
       await strapi.documents("api::daily-menu.daily-menu").update({
-        documentId: menuDate.menuDay,
-        data: { fixedPriceMenu: updateMenuPrice },
+        documentId: menuDate[0].documentId,
+        data: {
+          fixedPriceMenu: updatefixedPriceMenu,
+          sumPrice: updateSumPrice,
+        },
       });
-      return { dishDate, updateMenuPrice };
+      return { dishDate, updateSumPrice, updatefixedPriceMenu };
     } catch (error) {
       strapi.log.error(
         "Error al calcular el precio del plato con impuestos",
