@@ -43,26 +43,56 @@ module.exports = createCoreController(
     async getMenuWithoutAllergens(ctx) {
       try {
         const { menuDay } = ctx.request.query;
+
         if (!menuDay) {
-          return ctx.badRequest("No existe el menú");
+          return ctx.badRequest("No se ha especificado el día del menú");
         }
         const menuWithoutAllergens = await strapi
-          .documents("api::dish.dish")
+          .documents("api::daily-menu.daily-menu")
           .findMany({
             filters: {
-              allergen: {
+              menuDay: menuDay,
+            },
+            populate: {
+              firstCourse: {
                 populate: {
-                  allergenName: { $notContains: ["gluten", "lactosa"] },
+                  allergen: true,
+                },
+              },
+              secondCourse: {
+                populate: {
+                  allergen: true,
+                },
+              },
+              dessert: {
+                populate: {
+                  allergen: true,
                 },
               },
             },
           });
-        if (!menuWithoutAllergens) {
+        const filterMenus = menuWithoutAllergens.filter((menuName) => {
+          const allMenuDishes = [
+            menuName.firstCourse,
+            menuName.secondCourse,
+            menuName.dessert,
+          ];
+          const dishesExcludedAllergens = allMenuDishes.some((nameOfDish) => {
+            if (nameOfDish.allergen) {
+              return nameOfDish.allergen.some((allergen) =>
+                ["gluten", "lactosa"].includes(allergen.allergenName)
+              );
+            }
+            return false;
+          });
+          return !dishesExcludedAllergens;
+        });
+        if (filterMenus.length === 0) {
           return ctx.badRequest("No existen menús sin gluten o sin lactosa");
         }
-
-        return ctx.send(menuWithoutAllergens);
+        return ctx.send(filterMenus);
       } catch (error) {
+        strapi.log.error("Error al obtener los menús", error);
         return ctx.throw(500, "Error interno del servidor");
       }
     },

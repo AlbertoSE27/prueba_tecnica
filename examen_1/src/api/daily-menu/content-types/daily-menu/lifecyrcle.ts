@@ -2,7 +2,7 @@
 
 module.exports = {
   async beforeCreate(event) {
-    const { data } = event.params;
+    const { data } = event.params.data;
     try {
       const existingDishes = await strapi.documents("api::dish.dish").findMany({
         filters: {
@@ -45,7 +45,7 @@ module.exports = {
 };
 
 //LICECYRCLE SIN EL SERVICIO
-/*module.exports = {
+module.exports = {
   async beforeCreate(event) {
     const { data } = event.params;
     try {
@@ -98,4 +98,4 @@ module.exports = {
       strapi.log.error("Error interno del servidor", error);
     }
   },
-};*/
+};
