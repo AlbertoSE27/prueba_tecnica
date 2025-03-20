@@ -6,13 +6,25 @@ module.exports = {
     try {
       const existingDishes = await strapi.documents("api::dish.dish").findMany({
         filters: {
-          nameOfDish: data.nameOfDish,
-          typeOfDish: { $ne: data.typeOfDish },
+          $or: [
+            {
+              nameOfDish: data.nameOfDish,
+              typeOfDish: { $ne: "First Course" },
+            },
+            {
+              nameOfDish: data.nameOfDish,
+              typeOfDish: { $ne: "Second Course" },
+            },
+            {
+              nameOfDish: data.nameOfDish,
+              typeOfDish: { $ne: "Dessert" },
+            },
+          ],
         },
       });
-      if (existingDishes) {
+      if (existingDishes.length > 0) {
         return {
-          message: `El plato ${data.nameOfDish} ya existe como ${existingDishes[0].typeOfDish}`,
+          message: `El plato ${existingDishes[0].nameOfDish} ya existe en otra categoría.`,
         };
       }
     } catch (error) {
@@ -22,7 +34,9 @@ module.exports = {
   async afterCreate(event) {
     const { result } = event;
     try {
-      const priceInfo = await strapi.service("api::dish.dish").getPriceOfDish();
+      const priceInfo = await strapi
+        .service("api::daily-menu.daily-menu")
+        .calculateMenuPrice();
       return priceInfo;
     } catch (error) {
       strapi.log.error("Error interno del servidor", error);
@@ -37,13 +51,25 @@ module.exports = {
     try {
       const existingDishes = await strapi.documents("api::dish.dish").findMany({
         filters: {
-          nameOfDish: data.nameOfDish,
-          typeOfDish: { $ne: data.typeOfDish },
+          $or: [
+            {
+              nameOfDish: data.firstCourse.nameOfDish,
+              typeOfDish: { $ne: "First Course" },
+            },
+            {
+              nameOfDish: data.secondCourse.nameOfDish,
+              typeOfDish: { $ne: "Second Course" },
+            },
+            {
+              nameOfDish: data.dessert.nameOfDish,
+              typeOfDish: { $ne: "Dessert" },
+            },
+          ],
         },
       });
-      if (existingDishes) {
+      if (existingDishes.length > 0) {
         return {
-          message: `El plato ${data.nameOfDish} ya existe como ${existingDishes[0].typeOfDish}`,
+          message: `El plato ${existingDishes[0].nameOfDish} ya existe en otra categoría.`,
         };
       }
     } catch (error) {
@@ -54,15 +80,19 @@ module.exports = {
     const { result } = event;
     try {
       const dishesDate = await strapi.documents("api::dish.dish").findMany({
-        fields: ["nameOfDish", "priceOfDish"],
+        filters: {
+          nameOfDish: result.nameOfDish,
+          priceOfDish: result.priceOfDish,
+        },
       });
-      const totalPrice = dishesDate.reduce(
-        (sum, dish) => sum + dish.priceOfDish,
-        0
-      );
+      const totalPrice = dishesDate.reduce((sum, dish) => {
+        {
+          return sum + dish.priceOfDish;
+        }
+      }, 0);
       await strapi.documents("api::daily-menu.daily-menu").update({
-        documentId: result.documentIdid,
-        data: { sumPrice: "totalPrice" },
+        documentId: result.id,
+        data: { sumPrice: totalPrice.toString() },
       });
     } catch (error) {
       strapi.log.error("Error interno del servidor", error);
