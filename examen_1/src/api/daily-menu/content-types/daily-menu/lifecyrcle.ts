@@ -7,15 +7,15 @@ module.exports = {
         filters: {
           $or: [
             {
-              nameOfDish: data.nameOfDish,
+              nameOfDish: data.firstCourse.nameOfDish,
               typeOfDish: { $ne: "First Course" },
             },
             {
-              nameOfDish: data.nameOfDish,
+              nameOfDish: data.secondCourse.nameOfDish,
               typeOfDish: { $ne: "Second Course" },
             },
             {
-              nameOfDish: data.nameOfDish,
+              nameOfDish: data.dessert.nameOfDish,
               typeOfDish: { $ne: "Dessert" },
             },
           ],
@@ -44,7 +44,7 @@ module.exports = {
 };
 
 //LICECYRCLE SIN EL SERVICIO
-module.exports = {
+/*module.exports = {
   async beforeCreate(event) {
     const { data } = event.params;
     try {
@@ -97,4 +97,4 @@ module.exports = {
       strapi.log.error("Error interno del servidor", error);
     }
   },
-};
+};*/
