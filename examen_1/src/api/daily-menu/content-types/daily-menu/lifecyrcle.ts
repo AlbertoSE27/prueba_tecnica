@@ -1,8 +1,7 @@
 //LIFECYRCLE CON EL SERVICIO
-
 module.exports = {
   async beforeCreate(event) {
-    const { data } = event.params.data;
+    const { data } = event.params;
     try {
       const existingDishes = await strapi.documents("api::dish.dish").findMany({
         filters: {
