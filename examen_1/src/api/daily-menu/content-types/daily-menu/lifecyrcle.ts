@@ -7,6 +7,7 @@ export default {
       const existingDishes = await strapi
         .documents("api::daily-menu.daily-menu")
         .findMany({
+          documentId: data.documentId,
           filters: {
             menuDay: data.menuDay,
           },
