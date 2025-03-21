@@ -1,5 +1,5 @@
 const { createCoreService } = require("@strapi/strapi").factories;
-module.exports = createCoreService(
+export default createCoreService(
   "api::daily-menu.daily-menu",
   ({ strapi }) => ({
     async calculateMenuPrice() {

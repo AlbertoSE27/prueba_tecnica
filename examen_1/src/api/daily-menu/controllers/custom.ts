@@ -1,5 +1,5 @@
 const { createCoreController } = require("@strapi/strapi").factories;
-module.exports = createCoreController(
+export default createCoreController(
   "api::daily-menu.daily-menu",
   ({ strapi }) => ({
     async getDessert(ctx) {

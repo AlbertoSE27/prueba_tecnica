@@ -1,5 +1,50 @@
 //LIFECYRCLE CON EL SERVICIO
-module.exports = {
+
+export default {
+  async beforeCreate(event) {
+    const { data } = event.params.data;
+    try {
+      const existingDishes = await strapi
+        .documents("api::daily-menu.daily-menu")
+        .findMany({
+          filters: {
+            menuDay: data.menuDay,
+          },
+          populate: {
+            firstCourse: data.firstCourse,
+            secondCourse: data.secondCourse,
+            dessert: data.dessert,
+          },
+        });
+      if (
+        data.firstCourse === data.secondCourse ||
+        data.firstCourse === data.dessert ||
+        data.secondCourse === data.dessert
+      )
+        return {
+          message: `El plato ya existe en otra categoría.`,
+        };
+      return { existingDishes };
+    } catch (error) {
+      strapi.log.error("Error interno del servidor", error);
+    }
+  },
+  async afterCreate(event) {
+    const { result } = event;
+    try {
+      const priceInfo = await strapi
+        .service("api::daily-menu.daily-menu")
+        .calculateMenuPrice();
+      return priceInfo;
+    } catch (error) {
+      strapi.log.error("Error interno del servidor", error);
+    }
+  },
+};
+
+// LIFECYRCLE CON EL SERVICIO
+
+/*export default {
   async beforeCreate(event) {
     const { data } = event.params;
     try {
@@ -26,6 +71,7 @@ module.exports = {
           message: `El plato ${existingDishes[0].nameOfDish} ya existe en otra categoría.`,
         };
       }
+      return { existingDishes };
     } catch (error) {
       strapi.log.error("Error interno del servidor", error);
     }
@@ -43,8 +89,9 @@ module.exports = {
   },
 };
 
-//LICECYRCLE SIN EL SERVICIO
-/*module.exports = {
+// LICECYRCLE SIN EL SERVICIO
+
+export default {
   async beforeCreate(event) {
     const { data } = event.params;
     try {
