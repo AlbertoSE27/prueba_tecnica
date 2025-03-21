@@ -2,7 +2,7 @@
 
 export default {
   async beforeCreate(event) {
-    const { data } = event.params.data;
+    const { data } = event.params;
     try {
       const existingDishes = await strapi
         .documents("api::daily-menu.daily-menu")
@@ -22,7 +22,7 @@ export default {
         data.secondCourse === data.dessert
       )
         return {
-          message: `El plato ya existe en otra categoría.`,
+          message: "El plato ya existe en otra categoría.",
         };
       return { existingDishes };
     } catch (error) {
