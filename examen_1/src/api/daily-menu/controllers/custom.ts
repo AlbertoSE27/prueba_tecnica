@@ -97,6 +97,8 @@ export default createCoreController(
     },
     async getPoppularDishes(ctx) {
       try {
+        const { popularDishes } = ctx.request.query;
+        if (!popularDishes) return "No se encuentran platos populares";
         const dailyMenus = await strapi
           .documents("api::daily-menu.daily-menu")
           .findMany({
@@ -158,7 +160,7 @@ export default createCoreController(
           .map(([nameOfDish, count]) => ({ nameOfDish, count }))
           .sort((a, b) => Number(b.count) - Number(a.count))
           .map(({ nameOfDish }) => nameOfDish);
-        const popularDishes = await strapi
+        const bestSellingDishes = await strapi
           .documents("api::dish.dish")
           .findMany({
             filters: {
@@ -168,10 +170,10 @@ export default createCoreController(
             },
             limit: 1,
           });
-        if (!popularDishes || popularDishes.length === 0) {
+        if (!bestSellingDishes || bestSellingDishes.length === 0) {
           return ctx.badRequest("No se encontraron platos populares");
         }
-        return ctx.send(popularDishes);
+        return ctx.send(bestSellingDishes);
       } catch (error) {
         return ctx.throw(500, "Error interno del servidor");
       }

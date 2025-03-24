@@ -1,6 +1,6 @@
 //LIFECYCLE CON EL SERVICIO
 
-export default {
+/*export default {
   beforeCreate: async (event) => {
     const { data } = event.params;
     try {
@@ -40,7 +40,7 @@ export default {
       strapi.log.error("Error interno del servidor", error);
     }
   },
-};
+};*/
 
 // LIFECYCLES CON EL SERVICIO
 
@@ -87,31 +87,62 @@ export default {
       strapi.log.error("Error interno del servidor", error);
     }
   },
-};
+};*/
 
 // LICECYCLES SIN EL SERVICIO
 
+import { errors } from "@strapi/utils";
+const { ApplicationError } = errors;
 export default {
-  async afterCreate(event) {
+  afterCreate: async (event) => {
     const { result } = event;
     try {
-      const dishesDate = await strapi.documents("api::dish.dish").findMany({
-        filters: {
-          nameOfDish: result.nameOfDish,
-          priceOfDish: result.priceOfDish,
-        },
-      });
-      const totalPrice = dishesDate.reduce((sum, dish) => {
-        {
-          return sum + dish.priceOfDish;
-        }
-      }, 0);
-      await strapi.documents("api::daily-menu.daily-menu").update({
-        documentId: result.id,
-        data: { sumPrice: totalPrice.toString() },
-      });
+      const menuDishesPrice = await strapi
+        .documents("api::daily-menu.daily-menu")
+        .findMany({
+          populate: {
+            firstCourse: { fields: ["priceOfDish"] },
+            secondCourse: { fields: ["priceOfDish"] },
+            dessert: { fields: ["priceOfDish"] },
+          },
+        });
+      const { firstCourse, secondCourse, dessert } = menuDishesPrice[0];
+      const totalPriceMenu =
+        (firstCourse?.priceOfDish ?? 0) +
+        (secondCourse?.priceOfDish ?? 0) +
+        (dessert.priceOfDish ?? 0);
+      event.result.sumPrice = totalPriceMenu;
+    } catch (error) {
+      strapi.log.error("Error interno del servidor", error);
+    }
+    const { date } = event.params;
+    try {
+      const existingDishes = await strapi
+        .documents("api::daily-menu.daily-menu")
+        .findMany({
+          filters: {
+            menuDay: event.params.data.menuDay,
+          },
+          populate: {
+            firstCourse: { fields: ["nameOfDish"] },
+            secondCourse: { fields: ["nameOfDish"] },
+            dessert: { fields: ["nameOfDish"] },
+          },
+        });
+      if (
+        existingDishes[0].firstCourse.nameOfDish ===
+          existingDishes[0].secondCourse.nameOfDish ||
+        existingDishes[0].firstCourse.nameOfDish ===
+          existingDishes[0].dessert.nameOfDish ||
+        existingDishes[0].secondCourse.nameOfDish ===
+          existingDishes[0].dessert.nameOfDish
+      ) {
+        throw new ApplicationError("El plato ya existe en otra categoría");
+      } else {
+        console.log("FUNCIONA");
+      }
     } catch (error) {
       strapi.log.error("Error interno del servidor", error);
     }
   },
-};*/
+};
