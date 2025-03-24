@@ -1,26 +1,25 @@
-//LIFECYRCLE CON EL SERVICIO
+//LIFECYCLE CON EL SERVICIO
 
 export default {
-  async beforeCreate(event) {
+  beforeCreate: async (event) => {
     const { data } = event.params;
     try {
       const existingDishes = await strapi
         .documents("api::daily-menu.daily-menu")
         .findMany({
-          documentId: data.documentId,
           filters: {
             menuDay: data.menuDay,
           },
           populate: {
-            firstCourse: data.firstCourse,
-            secondCourse: data.secondCourse,
-            dessert: data.dessert,
+            firstCourse: data.firstCourse.nameOfDish,
+            secondCourse: data.secondCourse.nameOfDish,
+            dessert: data.dessert.nameOfDish,
           },
         });
       if (
-        data.firstCourse === data.secondCourse ||
-        data.firstCourse === data.dessert ||
-        data.secondCourse === data.dessert
+        data.firstCourse.nameOfDish === data.secondCourse.nameOfDish ||
+        data.firstCourse.nameOfDish === data.dessert.nameOfDish ||
+        data.secondCourse.nameOfDish === data.dessert.nameOfDish
       )
         return {
           message: "El plato ya existe en otra categoría.",
@@ -43,7 +42,7 @@ export default {
   },
 };
 
-// LIFECYRCLE CON EL SERVICIO
+// LIFECYCLES CON EL SERVICIO
 
 /*export default {
   async beforeCreate(event) {
@@ -90,39 +89,9 @@ export default {
   },
 };
 
-// LICECYRCLE SIN EL SERVICIO
+// LICECYCLES SIN EL SERVICIO
 
 export default {
-  async beforeCreate(event) {
-    const { data } = event.params;
-    try {
-      const existingDishes = await strapi.documents("api::dish.dish").findMany({
-        filters: {
-          $or: [
-            {
-              nameOfDish: data.firstCourse.nameOfDish,
-              typeOfDish: { $ne: "First Course" },
-            },
-            {
-              nameOfDish: data.secondCourse.nameOfDish,
-              typeOfDish: { $ne: "Second Course" },
-            },
-            {
-              nameOfDish: data.dessert.nameOfDish,
-              typeOfDish: { $ne: "Dessert" },
-            },
-          ],
-        },
-      });
-      if (existingDishes.length > 0) {
-        return {
-          message: `El plato ${existingDishes[0].nameOfDish} ya existe en otra categoría.`,
-        };
-      }
-    } catch (error) {
-      strapi.log.error("Error interno del servidor", error);
-    }
-  },
   async afterCreate(event) {
     const { result } = event;
     try {

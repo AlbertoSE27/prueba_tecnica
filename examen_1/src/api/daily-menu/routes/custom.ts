@@ -18,11 +18,11 @@ export default {
       handler: "custom.getMenuWithoutAllergens",
       config: { auth: false, policies: [] },
     },
-    /*{
+    {
       method: "GET",
       path: "/daily-menu/poppulatedishes",
       handler: "custom.getPoppularDishes",
       config: { auth: false, policies: [] },
-    },*/
+    },
   ],
 };

@@ -92,28 +92,89 @@ export default createCoreController(
         }
         return ctx.send(filterMenus);
       } catch (error) {
-        strapi.log.error("Error al obtener los menús", error);
         return ctx.throw(500, "Error interno del servidor");
       }
     },
-    /*async getPoppularDishes(ctx) {
+    async getPoppularDishes(ctx) {
       try {
-        const { nameOfDish, dishId } = ctx.request.query;
-        if (!nameOfDish || !dishId) {
-          return ctx.badRequest("No existe el nombre ni el id del plato");
-        }
-        const poppularDishes = await strapi
+        const dailyMenus = await strapi
+          .documents("api::daily-menu.daily-menu")
+          .findMany({
+            populate: {
+              firstCourse: true,
+              secondCourse: true,
+              dessert: true,
+            },
+          });
+        const dishCounts = {};
+        dailyMenus.forEach(
+          (menu: {
+            firstCourse: { nameOfDish: string }[];
+            secondCourse: { nameOfDish: string }[];
+            dessert: { nameOfDish: string }[];
+          }) => {
+            menu.firstCourse.forEach((firstCourse: { nameOfDish: string }) => {
+              if (dishCounts[firstCourse.nameOfDish]) {
+                dishCounts[firstCourse.nameOfDish]++;
+              } else {
+                dishCounts[firstCourse.nameOfDish] = 1;
+              }
+            });
+          }
+        );
+        dailyMenus.forEach(
+          (menu: {
+            firstCourse: { nameOfDish: string }[];
+            secondCourse: { nameOfDish: string }[];
+            dessert: { nameOfDish: string }[];
+          }) => {
+            menu.secondCourse.forEach(
+              (secondCourse: { nameOfDish: string }) => {
+                if (dishCounts[secondCourse.nameOfDish]) {
+                  dishCounts[secondCourse.nameOfDish]++;
+                } else {
+                  dishCounts[secondCourse.nameOfDish] = 1;
+                }
+              }
+            );
+          }
+        );
+        dailyMenus.forEach(
+          (menu: {
+            firstCourse: { nameOfDish: string }[];
+            secondCourse: { nameOfDish: string }[];
+            dessert: { nameOfDish: string }[];
+          }) => {
+            menu.dessert.forEach((dessert: { nameOfDish: string }) => {
+              if (dishCounts[dessert.nameOfDish]) {
+                dishCounts[dessert.nameOfDish]++;
+              } else {
+                dishCounts[dessert.nameOfDish] = 1;
+              }
+            });
+          }
+        );
+        const dishes = Object.entries(dishCounts)
+          .map(([nameOfDish, count]) => ({ nameOfDish, count }))
+          .sort((a, b) => Number(b.count) - Number(a.count))
+          .map(({ nameOfDish }) => nameOfDish);
+        const popularDishes = await strapi
           .documents("api::dish.dish")
           .findMany({
-            filters: { nameOfDish: "*" },
+            filters: {
+              nameOfDish: {
+                $in: dishes,
+              },
+            },
+            limit: 1,
           });
-        if (!poppularDishes) {
-          return ctx.badRequest("No existen platos mas vendidos o populares");
+        if (!popularDishes || popularDishes.length === 0) {
+          return ctx.badRequest("No se encontraron platos populares");
         }
-        return ctx.send(poppularDishes);
+        return ctx.send(popularDishes);
       } catch (error) {
         return ctx.throw(500, "Error interno del servidor");
       }
-    },*/
+    },
   })
 );
