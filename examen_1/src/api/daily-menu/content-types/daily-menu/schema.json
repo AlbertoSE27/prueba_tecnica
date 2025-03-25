@@ -13,7 +13,8 @@
   "attributes": {
     "menuDay": {
       "type": "string",
-      "required": true
+      "required": true,
+      "unique": true
     },
     "firstCourse": {
       "type": "relation",

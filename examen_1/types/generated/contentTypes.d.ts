@@ -393,7 +393,9 @@ export interface ApiDailyMenuDailyMenu extends Struct.CollectionTypeSchema {
       'api::daily-menu.daily-menu'
     > &
       Schema.Attribute.Private;
-    menuDay: Schema.Attribute.String & Schema.Attribute.Required;
+    menuDay: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
     publishedAt: Schema.Attribute.DateTime;
     secondCourse: Schema.Attribute.Relation<'oneToOne', 'api::dish.dish'>;
     sumPrice: Schema.Attribute.Decimal;
