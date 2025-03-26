@@ -3,7 +3,7 @@ import { errors } from "@strapi/utils";
 const { ApplicationError } = errors;
 export default {
   beforeCreate: async (event) => {
-    const { date } = event.params;
+    const { data } = event.params;
     try {
       const existingDishes = await strapi
         .documents("api::daily-menu.daily-menu")

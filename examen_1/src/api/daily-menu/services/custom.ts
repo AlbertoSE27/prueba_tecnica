@@ -1,4 +1,5 @@
 import { factories } from "@strapi/strapi";
+import { error } from "console";
 export default factories.createCoreService(
   "api::daily-menu.daily-menu",
   ({ strapi }) => ({
@@ -19,17 +20,17 @@ export default factories.createCoreService(
                 fields: ["priceOfDish"],
               },
             },
-          });
-        const menuDate = await strapi
-          .documents("api::daily-menu.daily-menu")
-          .findMany({
             fields: ["fixedPriceMenu", "sumPrice"],
           });
+        if (!menuDishesPrice) {
+          throw new error("No se encontró el menú");
+        }
         const taxRate = 0.21;
-        const updateSumPrice = menuDate[0].sumPrice * (1 + taxRate);
-        const updatefixedPriceMenu = menuDate[0].fixedPriceMenu * (1 + taxRate);
+        const updateSumPrice = menuDishesPrice.sumPrice * (1 + taxRate);
+        const updatefixedPriceMenu =
+          menuDishesPrice.fixedPriceMenu * (1 + taxRate);
         await strapi.documents("api::daily-menu.daily-menu").update({
-          documentId: menuDate[0].documentId,
+          documentId: menu.documentId,
           data: {
             fixedPriceMenu: updatefixedPriceMenu,
             sumPrice: updateSumPrice,
@@ -41,7 +42,7 @@ export default factories.createCoreService(
           "Error al calcular el precio del plato con impuestos",
           error
         );
-        throw new Error("Error interno del servidor");
+        throw new error("Error interno del servidor");
       }
     },
   })
