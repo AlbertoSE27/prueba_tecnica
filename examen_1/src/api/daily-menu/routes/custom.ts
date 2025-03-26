@@ -20,8 +20,8 @@ export default {
     },
     {
       method: "GET",
-      path: "/daily-menu/poppulatedishes",
-      handler: "custom.getPoppularDishes",
+      path: "/daily-menu/populardishes",
+      handler: "custom.getPopularDishes",
       config: { auth: false, policies: [] },
     },
   ],

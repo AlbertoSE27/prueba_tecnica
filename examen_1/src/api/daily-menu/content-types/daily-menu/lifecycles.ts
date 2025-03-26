@@ -68,3 +68,68 @@ export default {
     }
   },
 };
+
+/*import { data } from "@remix-run/router";
+import { errors } from "@strapi/utils";
+const { ApplicationError } = errors;
+export default {
+  beforeCreate: async (event) => {
+    const { data } = event.params;
+    const ctx = strapi.requestContext.get();
+    const { params } = ctx;
+    const { id } = params;
+    try {
+      const existingDishes = await strapi
+        .documents("api::daily-menu.daily-menu")
+        .findOne({
+          documentId: id,
+          populate: {
+            firstCourse: { fields: ["nameOfDish"] },
+            secondCourse: { fields: ["nameOfDish"] },
+            dessert: { fields: ["nameOfDish"] },
+          },
+        });
+      if (
+        existingDishes &&
+        existingDishes.firstCourse &&
+        existingDishes.secondCourse &&
+        existingDishes.dessert
+      ) {
+        const { firstCourse, secondCourse, dessert } = existingDishes[0];
+        if (
+          firstCourse.nameOfDish === secondCourse.nameOfDish ||
+          firstCourse.nameOfDish === dessert.nameOfDish ||
+          secondCourse.nameOfDish === dessert.nameOfDish
+        ) {
+          throw new ApplicationError("El plato ya existe en otra categoría");
+        }
+      }
+    } catch (error) {
+      throw error;
+    }
+    try {
+      const menuDishesPrice = await strapi
+        .documents("api::daily-menu.daily-menu")
+        .findOne({
+          documentId: id,
+          populate: {
+            firstCourse: { fields: ["priceOfDish"] },
+            secondCourse: { fields: ["priceOfDish"] },
+            dessert: { fields: ["priceOfDish"] },
+          },
+        });
+      const { firstCourse, secondCourse, dessert } = menuDishesPrice;
+      const totalPriceMenu =
+        (firstCourse?.priceOfDish ?? 0) +
+        (secondCourse?.priceOfDish ?? 0) +
+        (dessert.priceOfDish ?? 0);
+      data.sumPrice = totalPriceMenu;
+      const service = await strapi
+        .service("api::daily-menu.custom")
+        .calculateMenuPrice(menuDishesPrice);
+      return service;
+    } catch (error) {
+      strapi.log.error("Error interno del servidor", error);
+    }
+  },
+};*/

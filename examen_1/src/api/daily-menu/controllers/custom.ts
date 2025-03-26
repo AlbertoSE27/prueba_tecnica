@@ -1,38 +1,45 @@
-const { createCoreController } = require("@strapi/strapi").factories;
-export default createCoreController(
+import { factories } from "@strapi/strapi";
+export default factories.createCoreController(
   "api::daily-menu.daily-menu",
   ({ strapi }) => ({
     async getDessert(ctx) {
       try {
-        const { dessert } = ctx.request.query;
-        if (!dessert) {
+        const menuDessert = await strapi
+          .documents("api::daily-menu.daily-menu")
+          .findMany({
+            populate: {
+              dessert: {
+                fields: ["nameOfDish"],
+              },
+            },
+          });
+        if (!menuDessert) {
           return ctx.badRequest("El postre no existe en el menú");
         }
-        const dessertName = await strapi.documents("api::dish.dish").findMany({
-          filters: { typeOfDish: "dessert" },
-        });
-        if (!dessertName) {
-          return ctx.badRequest("El postre no existe en el menú");
-        }
-        return ctx.send(dessertName);
+        return ctx.send(menuDessert);
       } catch (error) {
         return ctx.throw(500, "Error interno del servidor");
       }
     },
     async getMenuPrice(ctx) {
       try {
-        const { fixedPriceMenu } = ctx.request.query;
-        if (!fixedPriceMenu) {
-          return ctx.badRequest("El menú no tiene precio");
+        const { minPrice, maxPrice } = ctx.request.query;
+        if (!minPrice && !maxPrice) {
+          return ctx.badRequest("El menú no tiene rango de precio");
         }
         const rangeMenuPrice = await strapi
           .documents("api::daily-menu.daily-menu")
           .findMany({
-            filters: { fixedPriceMenu: { $gte: 10, $lte: 20 } },
+            filters: {
+              fixedPriceMenu: {
+                $gte: Number(minPrice),
+                $lte: Number(maxPrice),
+              },
+            },
           });
         if (rangeMenuPrice.length === 0) {
           return ctx.badRequest(
-            "No se encuentran menús con rando de precio entre 10 y 20"
+            "No se encuentran menús con rango de precio establecido"
           );
         }
         return ctx.send(rangeMenuPrice);
@@ -42,138 +49,93 @@ export default createCoreController(
     },
     async getMenuWithoutAllergens(ctx) {
       try {
-        const { menuDay } = ctx.request.query;
-
-        if (!menuDay) {
-          return ctx.badRequest("No se ha especificado el día del menú");
+        const { withoutAllergens } = ctx.request.query;
+        if (!withoutAllergens) {
+          return ctx.badRequest("El menú no tiene alérgenos");
         }
-        const menuWithoutAllergens = await strapi
+        const menuAllergens = await strapi
           .documents("api::daily-menu.daily-menu")
           .findMany({
-            filters: {
-              menuDay: menuDay,
-            },
+            fields: ["menuDay"],
             populate: {
               firstCourse: {
                 populate: {
-                  allergen: true,
+                  allergen: {
+                    filters: {
+                      allergenName: { $notIn: [String(withoutAllergens)] },
+                    },
+                  },
                 },
               },
               secondCourse: {
                 populate: {
-                  allergen: true,
+                  allergen: {
+                    filters: {
+                      allergenName: { $notIn: [String(withoutAllergens)] },
+                    },
+                  },
                 },
               },
               dessert: {
                 populate: {
-                  allergen: true,
+                  allergen: {
+                    filters: {
+                      allergenName: { $notIn: [String(withoutAllergens)] },
+                    },
+                  },
                 },
               },
             },
           });
-        const filterMenus = menuWithoutAllergens.filter((menuName) => {
-          const allMenuDishes = [
-            menuName.firstCourse,
-            menuName.secondCourse,
-            menuName.dessert,
-          ];
-          const dishesExcludedAllergens = allMenuDishes.some((nameOfDish) => {
-            if (nameOfDish.allergen) {
-              return nameOfDish.allergen.some((allergen) =>
-                ["gluten", "lactosa"].includes(allergen.allergenName)
-              );
-            }
-            return false;
-          });
-          return !dishesExcludedAllergens;
-        });
-        if (filterMenus.length === 0) {
-          return ctx.badRequest("No existen menús sin gluten o sin lactosa");
+        if (menuAllergens.length === 0) {
+          return ctx.badRequest(
+            "No existen menús sin los alérgenos especificados"
+          );
         }
-        return ctx.send(filterMenus);
+        return ctx.send(menuAllergens);
       } catch (error) {
         return ctx.throw(500, "Error interno del servidor");
       }
     },
-    async getPoppularDishes(ctx) {
+    async getPopularDishes(ctx) {
       try {
-        const { popularDishes } = ctx.request.query;
-        if (!popularDishes) return "No se encuentran platos populares";
-        const dailyMenus = await strapi
+        const menuDishes = await strapi
           .documents("api::daily-menu.daily-menu")
           .findMany({
+            fields: ["menuDay"],
             populate: {
-              firstCourse: true,
-              secondCourse: true,
-              dessert: true,
-            },
-          });
-        const dishCounts = {};
-        dailyMenus.forEach(
-          (menu: {
-            firstCourse: { nameOfDish: string }[];
-            secondCourse: { nameOfDish: string }[];
-            dessert: { nameOfDish: string }[];
-          }) => {
-            menu.firstCourse.forEach((firstCourse: { nameOfDish: string }) => {
-              if (dishCounts[firstCourse.nameOfDish]) {
-                dishCounts[firstCourse.nameOfDish]++;
-              } else {
-                dishCounts[firstCourse.nameOfDish] = 1;
-              }
-            });
-          }
-        );
-        dailyMenus.forEach(
-          (menu: {
-            firstCourse: { nameOfDish: string }[];
-            secondCourse: { nameOfDish: string }[];
-            dessert: { nameOfDish: string }[];
-          }) => {
-            menu.secondCourse.forEach(
-              (secondCourse: { nameOfDish: string }) => {
-                if (dishCounts[secondCourse.nameOfDish]) {
-                  dishCounts[secondCourse.nameOfDish]++;
-                } else {
-                  dishCounts[secondCourse.nameOfDish] = 1;
-                }
-              }
-            );
-          }
-        );
-        dailyMenus.forEach(
-          (menu: {
-            firstCourse: { nameOfDish: string }[];
-            secondCourse: { nameOfDish: string }[];
-            dessert: { nameOfDish: string }[];
-          }) => {
-            menu.dessert.forEach((dessert: { nameOfDish: string }) => {
-              if (dishCounts[dessert.nameOfDish]) {
-                dishCounts[dessert.nameOfDish]++;
-              } else {
-                dishCounts[dessert.nameOfDish] = 1;
-              }
-            });
-          }
-        );
-        const dishes = Object.entries(dishCounts)
-          .map(([nameOfDish, count]) => ({ nameOfDish, count }))
-          .sort((a, b) => Number(b.count) - Number(a.count))
-          .map(({ nameOfDish }) => nameOfDish);
-        const bestSellingDishes = await strapi
-          .documents("api::dish.dish")
-          .findMany({
-            filters: {
-              nameOfDish: {
-                $in: dishes,
+              firstCourse: {
+                fields: ["nameOfDish"],
+              },
+              secondCourse: {
+                fields: ["nameOfDish"],
+              },
+              dessert: {
+                fields: ["nameOfDish"],
               },
             },
-            limit: 1,
           });
-        if (!bestSellingDishes || bestSellingDishes.length === 0) {
-          return ctx.badRequest("No se encontraron platos populares");
+        const dishCount = {};
+        menuDishes.forEach((menu) => {
+          [menu.firstCourse, menu.secondCourse, menu.dessert].forEach(
+            (dish) => {
+              if (dish && dish.nameOfDish) {
+                if (dishCount[dish.nameOfDish]) {
+                  dishCount[dish.nameOfDish]++;
+                } else {
+                  dishCount[dish.nameOfDish] = 1;
+                }
+              }
+            }
+          );
+        });
+        const popularDishes = Object.keys(dishCount)
+          .sort((a, b) => dishCount[b] - dishCount[a])
+          .slice(0, 2);
+        if (popularDishes.length === 0) {
+          return ctx.badRequest("No se han encontrado platos populares");
         }
-        return ctx.send(bestSellingDishes);
+        return popularDishes;
       } catch (error) {
         return ctx.throw(500, "Error interno del servidor");
       }
