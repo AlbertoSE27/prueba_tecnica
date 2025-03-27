@@ -9,13 +9,13 @@ export default {
     {
       method: "GET",
       path: "/daily-menu/pricerange",
-      handler: "custom.getMenuPrice",
+      handler: "custom.filterMenuPrice",
       config: { auth: false, policies: [] },
     },
     {
       method: "GET",
       path: "/daily-menu/withoutallergens",
-      handler: "custom.getMenuWithoutAllergens",
+      handler: "custom.filterMenuWithoutAllergens",
       config: { auth: false, policies: [] },
     },
     {

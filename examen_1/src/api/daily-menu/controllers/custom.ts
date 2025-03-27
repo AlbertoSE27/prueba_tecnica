@@ -14,14 +14,14 @@ export default factories.createCoreController(
             },
           });
         if (!menuDessert) {
-          return ctx.badRequest("El postre no existe en el menú");
+          return ctx.badRequest("El menú no tiene postre");
         }
         return ctx.send(menuDessert);
       } catch (error) {
         return ctx.throw(500, "Error interno del servidor");
       }
     },
-    async getMenuPrice(ctx) {
+    async filterMenuPrice(ctx) {
       try {
         const { minPrice, maxPrice } = ctx.request.query;
         if (!minPrice && !maxPrice) {
@@ -47,7 +47,7 @@ export default factories.createCoreController(
         return ctx.throw(500, "Error interno del servidor");
       }
     },
-    async getMenuWithoutAllergens(ctx) {
+    async filterMenuWithoutAllergens(ctx) {
       try {
         const { withoutAllergens } = ctx.request.query;
         if (!withoutAllergens) {
@@ -58,41 +58,31 @@ export default factories.createCoreController(
           .findMany({
             fields: ["menuDay"],
             populate: {
-              firstCourse: {
-                populate: {
-                  allergen: {
-                    filters: {
-                      allergenName: { $notIn: [String(withoutAllergens)] },
-                    },
-                  },
-                },
-              },
-              secondCourse: {
-                populate: {
-                  allergen: {
-                    filters: {
-                      allergenName: { $notIn: [String(withoutAllergens)] },
-                    },
-                  },
-                },
-              },
-              dessert: {
-                populate: {
-                  allergen: {
-                    filters: {
-                      allergenName: { $notIn: [String(withoutAllergens)] },
-                    },
-                  },
-                },
-              },
+              firstCourse: { populate: { allergen: true } },
+              secondCourse: { populate: { allergen: true } },
+              dessert: { populate: { allergen: true } },
             },
           });
         if (menuAllergens.length === 0) {
-          return ctx.badRequest(
-            "No existen menús sin los alérgenos especificados"
-          );
+          return ctx.badRequest("No existen menús con alérgenos");
         }
-        return ctx.send(menuAllergens);
+        const filteredMenus = menuAllergens.filter((menu) => {
+          const hasAllergen = (dish: {
+            allergen?: { allergenName?: string }[];
+          }) =>
+            dish?.allergen?.some((allergen: { allergenName?: string }) =>
+              (String(ctx.request.query.withoutAllergens) || "")
+                .split(",")
+                .map((a: string) => a.trim().toLowerCase())
+                .includes(allergen.allergenName?.toLowerCase())
+            );
+          return (
+            !hasAllergen(menu.firstCourse) &&
+            !hasAllergen(menu.secondCourse) &&
+            !hasAllergen(menu.dessert)
+          );
+        });
+        return ctx.send(filteredMenus);
       } catch (error) {
         return ctx.throw(500, "Error interno del servidor");
       }
