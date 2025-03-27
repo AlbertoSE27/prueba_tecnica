@@ -49,7 +49,10 @@ export default {
         (dessert.priceOfDish ?? 0);
       await strapi.documents("api::daily-menu.daily-menu").update({
         documentId: result.documentId,
-        data: { sumPrice: totalPriceMenu },
+        data: {
+          sumPrice: totalPriceMenu,
+          status: "published",
+        },
       });
       const service = await strapi
         .service("api::daily-menu.custom")
