@@ -20,28 +20,19 @@ export default factories.createCoreService(
                 fields: ["priceOfDish"],
               },
             },
-            fields: ["fixedPriceMenu", "sumPrice", "taxApplied"],
+            fields: ["fixedPriceMenu", "sumPrice"],
           });
         if (!menuDishesPrice) {
           throw new error("No se encontró el menú");
         }
-        if (menuDishesPrice.taxApplied) {
-          strapi.log.info("Los impuestos ya fueron aplicados.");
-          return { message: "Impuestos ya aplicados." };
-        }
         const taxRate = 0.21;
-        const updateSumPrice = menuDishesPrice.sumPrice * (1 + taxRate);
+        const sumPriceDishes =
+          menuDishesPrice.firstCourse.priceOfDish +
+          menuDishesPrice.secondCourse.priceOfDish +
+          menuDishesPrice.dessert.priceOfDish;
+        const updateSumPrice = sumPriceDishes * (1 + taxRate);
         const updatefixedPriceMenu =
           menuDishesPrice.fixedPriceMenu * (1 + taxRate);
-        await strapi.documents("api::daily-menu.daily-menu").update({
-          documentId: menu.documentId,
-          data: {
-            fixedPriceMenu: updatefixedPriceMenu,
-            sumPrice: updateSumPrice,
-            taxApplied: true,
-            status: "published",
-          },
-        });
         return { menuDishesPrice, updateSumPrice, updatefixedPriceMenu };
       } catch (error) {
         strapi.log.error(

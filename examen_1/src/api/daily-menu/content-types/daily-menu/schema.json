@@ -37,9 +37,6 @@
     },
     "sumPrice": {
       "type": "decimal"
-    },
-    "taxApplied": {
-      "type": "boolean"
     }
   }
 }
