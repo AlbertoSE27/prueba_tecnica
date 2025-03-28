@@ -30,6 +30,7 @@ export default {
     }
   },
   afterCreate: async (event) => {
+    if (event.params?.data?.bypassLifecyrcles) return;
     const { result } = event;
     try {
       const menuDishesPrice = await strapi
@@ -47,11 +48,12 @@ export default {
         (firstCourse?.priceOfDish ?? 0) +
         (secondCourse?.priceOfDish ?? 0) +
         (dessert.priceOfDish ?? 0);
-      await strapi.documents("api::daily-menu.daily-menu").update({
-        documentId: result.documentId,
+      await strapi.db.query("api::daily-menu.daily-menu").update({
+        where: { id: result.id },
         data: {
           sumPrice: totalPriceMenu,
           status: "published",
+          bypassLifecyrcles: true,
         },
       });
       const service = await strapi
