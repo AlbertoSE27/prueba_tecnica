@@ -25,11 +25,11 @@ export default factories.createCoreService(
         if (!menuDishesPrice) {
           throw new error("No se encontró el menú");
         }
-        const taxRate = 0.21;
         const sumPriceDishes =
-          menuDishesPrice.firstCourse.priceOfDish +
-          menuDishesPrice.secondCourse.priceOfDish +
-          menuDishesPrice.dessert.priceOfDish;
+          (menuDishesPrice.firstCourse?.priceOfDish ?? 0) +
+          (menuDishesPrice.secondCourse?.priceOfDish ?? 0) +
+          (menuDishesPrice.dessert?.priceOfDish ?? 0);
+        const taxRate = 0.21;
         const updateSumPrice = sumPriceDishes * (1 + taxRate);
         const updatefixedPriceMenu =
           menuDishesPrice.fixedPriceMenu * (1 + taxRate);
