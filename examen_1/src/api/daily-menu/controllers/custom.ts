@@ -51,7 +51,7 @@ export default factories.createCoreController(
       try {
         const { withoutAllergens } = ctx.request.query;
         if (!withoutAllergens) {
-          return ctx.badRequest("El menú no tiene alérgenos");
+          return ctx.badRequest("No existen alérgenos");
         }
         const menuAllergens = await strapi
           .documents("api::daily-menu.daily-menu")
@@ -82,6 +82,11 @@ export default factories.createCoreController(
             !hasAllergen(menu.dessert)
           );
         });
+        if (filteredMenus.length === 0) {
+          return ctx.badRequest(
+            "No existen menús sin los alérgenos especificados"
+          );
+        }
         return ctx.send(filteredMenus);
       } catch (error) {
         return ctx.throw(500, "Error interno del servidor");
