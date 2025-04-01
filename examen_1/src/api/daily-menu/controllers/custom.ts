@@ -121,7 +121,7 @@ export default factories.createCoreController(
         });
         const popularDishes = Object.keys(dishCount)
           .sort((a, b) => dishCount[b] - dishCount[a])
-          .slice(0, 2);
+          .slice(0, 3);
         if (popularDishes.length === 0) {
           return ctx.badRequest("No se han encontrado platos populares");
         }
