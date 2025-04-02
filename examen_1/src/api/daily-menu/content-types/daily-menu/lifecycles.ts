@@ -48,7 +48,7 @@ export default {
       const totalPriceMenu =
         (firstCourse?.priceOfDish ?? 0) +
         (secondCourse?.priceOfDish ?? 0) +
-        (dessert.priceOfDish ?? 0);
+        (dessert?.priceOfDish ?? 0);
       data.sumPrice = totalPriceMenu;
       const service = await strapi
         .service("api::daily-menu.custom")
