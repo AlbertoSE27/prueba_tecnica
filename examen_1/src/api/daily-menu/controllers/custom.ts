@@ -66,22 +66,17 @@ export default factories.createCoreController(
         if (menuAllergens.length === 0) {
           return ctx.badRequest("No existen menús con alérgenos");
         }
-        const filteredMenus = menuAllergens.filter((menu) => {
-          const hasAllergen = (dish: {
-            allergen?: { allergenName?: string }[];
-          }) =>
-            dish?.allergen?.some((allergen: { allergenName?: string }) =>
-              (String(ctx.request.query.withoutAllergens) || "")
-                .split(",")
-                .map((a: string) => a.trim().toLowerCase())
-                .includes(allergen.allergenName?.toLowerCase())
-            );
-          return (
-            !hasAllergen(menu.firstCourse) &&
-            !hasAllergen(menu.secondCourse) &&
-            !hasAllergen(menu.dessert)
-          );
-        });
+        const filteredMenus = menuAllergens.filter(
+          (menu) =>
+            ![menu.firstCourse, menu.secondCourse, menu.dessert].some((dish) =>
+              dish?.allergen?.some((allergen) =>
+                (String(ctx.request.query.withoutAllergens) || "")
+                  .split(",")
+                  .map((a) => a.trim().toLowerCase())
+                  .includes(allergen.allergenName?.toLowerCase())
+              )
+            )
+        );
         if (filteredMenus.length === 0) {
           return ctx.badRequest(
             "No existen menús sin los alérgenos especificados"
