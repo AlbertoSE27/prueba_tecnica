@@ -21,6 +21,8 @@ export default factories.createCoreController(
         return ctx.throw(500, "Error interno del servidor");
       }
     },
+    // URL: http://localhost:1337/api/daily-menus?populate=dessert
+
     async filterMenuPrice(ctx) {
       try {
         const { minPrice, maxPrice } = ctx.request.query;
@@ -47,6 +49,8 @@ export default factories.createCoreController(
         return ctx.throw(500, "Error interno del servidor");
       }
     },
+    // URL: http://localhost:1337/api/daily-menus?filters[fixedPriceMenu][$gte]=10&filters[fixedPriceMenu][$lte]=20
+
     async filterMenuWithoutAllergens(ctx) {
       try {
         const { withoutAllergens } = ctx.request.query;
@@ -68,13 +72,14 @@ export default factories.createCoreController(
         }
         const filteredMenus = menuAllergens.filter(
           (menu) =>
-            ![menu.firstCourse, menu.secondCourse, menu.dessert].some((dish) =>
-              dish?.allergen?.some((allergen) =>
-                (String(ctx.request.query.withoutAllergens) || "")
-                  .split(",")
-                  .map((a) => a.trim().toLowerCase())
-                  .includes(allergen.allergenName?.toLowerCase())
-              )
+            ![menu.firstCourse, menu.secondCourse, menu.dessert].some(
+              (dishes) =>
+                dishes?.allergen?.some((allergens) =>
+                  (String(ctx.request.query.withoutAllergens) || "")
+                    .split(",")
+                    .map((a) => a.trim().toLowerCase())
+                    .includes(allergens.allergenName?.toLowerCase())
+                )
             )
         );
         if (filteredMenus.length === 0) {
@@ -87,6 +92,7 @@ export default factories.createCoreController(
         return ctx.throw(500, "Error interno del servidor");
       }
     },
+
     async getPopularDishes(ctx) {
       try {
         const menuDishes = await strapi
@@ -109,12 +115,9 @@ export default factories.createCoreController(
         menuDishes.forEach((menu) => {
           [menu.firstCourse, menu.secondCourse, menu.dessert].forEach(
             (dish) => {
-              if (dish && dish.nameOfDish) {
-                if (dishCount[dish.nameOfDish]) {
-                  dishCount[dish.nameOfDish]++;
-                } else {
-                  dishCount[dish.nameOfDish] = 1;
-                }
+              if (dish?.nameOfDish) {
+                dishCount[dish.nameOfDish] =
+                  (dishCount[dish.nameOfDish] || 0) + 1;
               }
             }
           );
