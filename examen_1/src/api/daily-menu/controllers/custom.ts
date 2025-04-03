@@ -7,6 +7,7 @@ export default factories.createCoreController(
         const menuDessert = await strapi
           .documents("api::daily-menu.daily-menu")
           .findMany({
+            fields: ["menuDay"],
             populate: {
               dessert: {
                 fields: ["nameOfDish"],
@@ -32,6 +33,7 @@ export default factories.createCoreController(
         const rangeMenuPrice = await strapi
           .documents("api::daily-menu.daily-menu")
           .findMany({
+            fields: ["menuDay, fixedPriceMenu"],
             filters: {
               fixedPriceMenu: {
                 $gte: Number(minPrice),
