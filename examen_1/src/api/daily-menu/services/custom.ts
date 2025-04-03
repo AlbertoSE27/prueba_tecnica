@@ -1,5 +1,4 @@
 import { factories } from "@strapi/strapi";
-import { error } from "console";
 export default factories.createCoreService(
   "api::daily-menu.daily-menu",
   ({ strapi }) => ({
@@ -23,7 +22,7 @@ export default factories.createCoreService(
             fields: ["fixedPriceMenu", "sumPrice"],
           });
         if (!menuDishesPrice) {
-          throw new error("No se encontró el menú");
+          throw new Error("No se encontró el menú ni su precio");
         }
         const sumPriceDishes =
           (menuDishesPrice.firstCourse?.priceOfDish ?? 0) +

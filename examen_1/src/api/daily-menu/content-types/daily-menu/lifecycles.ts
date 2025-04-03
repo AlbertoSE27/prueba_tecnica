@@ -2,30 +2,36 @@ import { errors } from "@strapi/utils";
 const { ApplicationError } = errors;
 export default {
   afterCreate: async (event) => {
-    const { data } = event.params;
+    const { result } = event;
     try {
       const existingDishes = await strapi
         .documents("api::daily-menu.daily-menu")
-        .findMany({
-          filters: { menuDay: data.menuDay },
+        .findOne({
+          documentId: result.documentId,
           populate: {
             firstCourse: { fields: ["nameOfDish"] },
             secondCourse: { fields: ["nameOfDish"] },
             dessert: { fields: ["nameOfDish"] },
           },
         });
-      if (existingDishes.length > 0) {
-        const { firstCourse, secondCourse, dessert } = existingDishes[0];
-        if (
-          firstCourse.nameOfDish === secondCourse.nameOfDish ||
-          firstCourse.nameOfDish === dessert.nameOfDish ||
-          secondCourse.nameOfDish === dessert.nameOfDish
-        ) {
-          throw new ApplicationError("El plato ya existe en otra categoría");
-        }
+      if (!existingDishes) {
+        throw new Error("Menú o nombre platos no encontrados.");
+      }
+      const { firstCourse, secondCourse, dessert } = existingDishes;
+      if (
+        (firstCourse?.nameOfDish ?? 0) === (secondCourse?.nameOfDish ?? 0) ||
+        (firstCourse?.nameOfDish ?? 0) === (dessert?.nameOfDish ?? 0) ||
+        (secondCourse?.nameOfDish ?? 0) === (dessert?.nameOfDish ?? 0) ||
+        !firstCourse.nameOfDish ||
+        !secondCourse.nameOfDish ||
+        !dessert.nameOfDish
+      ) {
+        throw new Error("El plato no existe o no tiene nombre");
       }
     } catch (error) {
-      throw error;
+      throw new ApplicationError(
+        "El plato ya existe en otra categoría o no hay un plato asignado"
+      );
     }
   },
   beforeCreate: async (event) => {
@@ -44,17 +50,23 @@ export default {
             dessert: { fields: ["priceOfDish"] },
           },
         });
-      const { firstCourse, secondCourse, dessert } = menuDishesPrice;
-      const totalPriceMenu =
-        (firstCourse?.priceOfDish ?? 0) +
-        (secondCourse?.priceOfDish ?? 0) +
-        (dessert?.priceOfDish ?? 0);
-      data.sumPrice = totalPriceMenu;
-      const service = await strapi
-        .service("api::daily-menu.custom")
-        .calculateMenuPrice(menuDishesPrice);
-      data.fixedPriceMenu = service.updatefixedPriceMenu;
-      data.sumPrice = service.updateSumPrice;
+      if (
+        menuDishesPrice?.firstCourse &&
+        menuDishesPrice?.secondCourse &&
+        menuDishesPrice?.dessert
+      ) {
+        const { firstCourse, secondCourse, dessert } = menuDishesPrice;
+        const totalPriceMenu =
+          (firstCourse?.priceOfDish ?? 0) +
+          (secondCourse?.priceOfDish ?? 0) +
+          (dessert?.priceOfDish ?? 0);
+        data.sumPrice = totalPriceMenu;
+        const service = await strapi
+          .service("api::daily-menu.custom")
+          .calculateMenuPrice(menuDishesPrice);
+        data.fixedPriceMenu = service.updatefixedPriceMenu;
+        data.sumPrice = service.updateSumPrice;
+      }
     } catch (error) {
       strapi.log.error("Error interno del servidor", error);
     }
