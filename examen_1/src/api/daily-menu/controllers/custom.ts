@@ -10,9 +10,10 @@ export default factories.createCoreController(
             fields: ["menuDay"],
             populate: {
               dessert: {
-                fields: ["nameOfDish"],
+                fields: ["nameOfDish, priceOfDish"],
               },
             },
+            status: "published",
           });
         if (!menuDessert) {
           return ctx.badRequest("El menú no tiene postre");
@@ -40,6 +41,7 @@ export default factories.createCoreController(
                 $lte: Number(maxPrice),
               },
             },
+            status: "published",
           });
         if (rangeMenuPrice.length === 0) {
           return ctx.badRequest(
@@ -68,6 +70,7 @@ export default factories.createCoreController(
               secondCourse: { populate: { allergen: true } },
               dessert: { populate: { allergen: true } },
             },
+            status: "published",
           });
         if (menuAllergens.length === 0) {
           return ctx.badRequest("No existen menús con alérgenos");
@@ -112,6 +115,7 @@ export default factories.createCoreController(
                 fields: ["nameOfDish"],
               },
             },
+            status: "published",
           });
         const dishCount = {};
         menuDishes.forEach((menu) => {
