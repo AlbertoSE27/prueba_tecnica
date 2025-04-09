@@ -1,0 +1,46 @@
+{
+  "kind": "collectionType",
+  "collectionName": "daily_menus",
+  "info": {
+    "singularName": "daily-menu",
+    "pluralName": "daily-menus",
+    "displayName": "DailyMenu",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "day": {
+      "type": "string",
+      "required": true
+    },
+    "first_dish": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::dishe.dishe"
+    },
+    "second_dish": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::dishe.dishe"
+    },
+    "dessert_dish": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::dishe.dishe"
+    },
+    "price": {
+      "type": "decimal",
+      "required": true,
+      "min": 0
+    },
+    "sumPrice": {
+      "type": "decimal",
+      "min": 0
+    },
+    "sumPriceIva": {
+      "type": "decimal"
+    }
+  }
+}
