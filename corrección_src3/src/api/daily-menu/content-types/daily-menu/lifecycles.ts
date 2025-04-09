@@ -55,14 +55,14 @@ module.exports = {
     if (currentPrice !== calculatedPrice) {
       await strapi.entityService.update(apiURL, result.id, {
         data: { sumPrice: calculatedPrice },
-      }); /* No haría falta el uso de actualizar los datos de la base de datos, ya que los actualizaría en el retorno del servicio anterior y evitaría que se pudiaram generar 
+      }); /* No haría falta el uso de actualizar los datos de la base de datos, ya que los actualizaría en el retorno del servicio anterior y evitaría que se pudiaran generar 
       bucles.*/
     }
 
     if (currentIva !== calculatedIva) {
       await strapi.entityService.update(apiURL, result.id, {
         data: { sumPriceIva: calculatedIva },
-      }); /* No haría falta el uso de actualizar los datos de la base de datos, ya que los actualizaría en el retorno del servicio anterior y evitaría que se pudiaram generar 
+      }); /* No haría falta el uso de actualizar los datos de la base de datos, ya que los actualizaría en el retorno del servicio anterior y evitaría que se pudiaran generar 
       bucles.*/
     }
   },
@@ -100,7 +100,7 @@ module.exports = {
         data: { sumPriceIva: calculatedIva },
       });
     }
-  } /* Todo esto anterior lo quitaría como he mencionado (al ser la misma lógica que el afterCreate) y juntaría ambos tal que así:
+  } /* Todo esta lógica anterior la quitaría como he mencionado (al ser la misma lógica que el afterCreate) y la juntaría ambas tal que así:
   
   async afterCreate(event){
   return await calculateDishesPrice(event.result)}
@@ -112,15 +112,15 @@ module.exports = {
   
   const {result} = event;
   
-  const menu= = await strapi.documents(apiURL).findOne({
+  const menu = await strapi.documents(apiURL).findOne({
   documentId: result.documentId,
   fields: ["sumPrice, sumPriceIva"],
   populate: {
-  first_dish: { fields: ["price"] },
-  secondCo_dish: { fields: ["price"] },
-  dessert_dish: { fields: ["price"] },
+    first_dish: { fields: ["price"] },
+    secondCo_dish: { fields: ["price"] },
+    dessert_dish: { fields: ["price"] },
   },
-  });
+});
 
   const calculatedPrice = await strapi.service(apiURL).calculateSumpPrecio(menu);
   
@@ -130,16 +130,16 @@ module.exports = {
   */,
 
   async beforeCreate(event) {
-    await validateNoDuplicateDishes(event.params.data); // Bien
+    await validateNoDuplicateDishes(event.params.data); // Bien, validar los platos antes de crear el menú.
   },
 
   async beforeUpdate(event) {
-    await validateNoDuplicateDishes(event.params.data); // Bien
+    await validateNoDuplicateDishes(event.params.data); // Bien, validar los platos antes de actualizar el menú.
   },
 };
 
 async function validateNoDuplicateDishes(data) {
-  const dishIds = [];
+  const dishIds = []; // Bien para almacenar los ids de los platos en un array.
   const extractId = (relation) => {
     if (!relation) return null;
 
@@ -149,6 +149,7 @@ async function validateNoDuplicateDishes(data) {
     if (relation.id) {
       return relation.id;
     }
+
     if (typeof relation === "number") {
       return relation;
     }
@@ -156,14 +157,17 @@ async function validateNoDuplicateDishes(data) {
       return relation.id;
     }
     return null;
-  };
+  }; /* Considero que esta parte del codigo está bien ya que se encarga de extraer el id de los platos y comprobar si existen, aunque yo habría hecho una consulta 
+  a la base de datos para obtenerlos y comprobar si existen*/
   const firstDishId = extractId(data.first_dish);
   const secondDishId = extractId(data.second_dish);
   const dessertDishId = extractId(data.dessert_dish);
+  //Esta bien, los ids extraidos con la función "extractId", se asignan a las variables correspondientes de cada plato.*/
   if (firstDishId) dishIds.push(firstDishId);
   if (secondDishId) dishIds.push(secondDishId);
   if (dessertDishId) dishIds.push(dessertDishId);
-  const uniqueDishIds = [...new Set(dishIds)];
+  //Bien, se agregan los ids de cada plato extraído al array "dishIds".
+  const uniqueDishIds = [...new Set(dishIds)]; // Creación de un nuevo array con los ids sin duplicar de los datos del array "dishIds"
   if (uniqueDishIds.length !== dishIds.length) {
     throw new ApplicationError(
       "No se puede repetir el mismo plato en diferentes categorías",
@@ -172,6 +176,43 @@ async function validateNoDuplicateDishes(data) {
         validation: "duplicate",
       }
     );
-  }
+  } // Bien para comparar el tamaño de ambos arrays creados y lanzar un error en caso de de fueran iguales, ya que significaría que hay platos duplicados.
   return { firstDishId, secondDishId, dessertDishId };
 }
+
+/* ESTA SEGUNDA PARTE DEL CÓDIGO LA HABRÍA HECHO CONSULTANDO LA BASE DE DATOS Y OBTENIENDO EL NOMBRE DE LOS PLATOS PARA COMPAPARLOS
+
+async function validateNoDuplicateDishes(data) {
+
+    const ctx = strapi.requestContext.get();
+    const { params } = ctx;
+    const { id } = params;
+    const { data } = event.params;
+    
+    try {
+      const uniqueDishName = await strapi.documents(apiURL).findOne({
+          documentId: id,
+          populate: {
+            first_dish: { fields: ["name"] },
+            second_dish: { fields: ["name"] },
+            dessert_dish: { fields: ["name"] },
+          },
+        });
+
+      const { first_dish, second_dish, dessert_dish } = uniqueDishName;
+
+      if (
+        (first_dish?.name ?? 0) === (second_dish?.name ?? 0) ||
+        (first_dish?.name ?? 0) === (dessert_dish?.name ?? 0) ||
+        (second_dish?.name ?? 0) === (dessert_dish?.name ?? 0)
+      ) {
+        throw new Error("Error");
+      }
+
+    } catch (error) {
+      throw new ApplicationError(
+        "No se puede repetir el mismo plato en diferentes categorías"
+      );
+    }
+  },
+ */

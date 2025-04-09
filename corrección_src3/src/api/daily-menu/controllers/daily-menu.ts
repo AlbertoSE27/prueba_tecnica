@@ -61,7 +61,7 @@ export default factories.createCoreController(UIDMODEL, ({ strapi }) => ({
         .sort((a, b) => b[1] - a[1])
         .map(([name, count]) => ({ name, count }));
       // Bien la conversión de los platos a un array de objetos con el nombre y la cantidad de veces que se repite y su odedenación.
-      return { popularDishes: sortedDishes }; // No veo necesario el uso de popularDishes, ya que el uso de sortedDishes es suficiente.
+      return { popularDishes: sortedDishes }; // No veo necesario el uso de "popularDishes", ya que el uso de sortedDishes es suficiente.
     } catch (error) {
       ctx.throw("Not found Dishes :", error); // Bien para el manejo de errores.
     }

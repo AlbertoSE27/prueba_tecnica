@@ -57,8 +57,11 @@ export default factories.createCoreService(
 /*REFACTORIZADO/CORREGIDO Y AÑADIENDO EL OTRO SERVICIO:
    
   import { factories } from '@strapi/strapi';
+  
   export default factories.createCoreService('api::daily-menu.daily-menu', ({ strapi }) => ({
+  
   async calculateSumPrecio(data) {
+  
   try {
     const dish = await strapi.documents("api::daily-menu.daily-menu").findOne({
     documentId: data.documentId,
@@ -74,10 +77,14 @@ export default factories.createCoreService(
       },
     },
     });
+    
     const total = dish.first_dish.price + dish.second_dish.price + dish.dessert_dish.price;
+    
     const iva = 0.21;
     const totalWithIva = total * (1 + iva);
+    
     return {total, totalWithIva};
+    
     } catch (error) {
      strapi.log.error("Error", error);
      throw new error("Error")}
